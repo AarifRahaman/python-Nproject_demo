@@ -1,0 +1,15 @@
+name: Trigger GitLab Pipeline
+on:
+  push:
+    branches: [ "main" ]   # adjust if needed
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger GitLab pipeline
+        run: |
+          curl -sS -X POST \
+            -H "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" \
+            --data "ref=${GITHUB_REF_NAME}" \
+            "${{ secrets.GITLAB_URL }}/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/pipeline"
