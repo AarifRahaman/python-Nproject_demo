@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "weather-poetry"
+version = "0.1.0"
+description = "Weather CLI"
+authors = ["Aarif <arifcse25@gmail.com>"]
+
+# Tell Poetry to package from src/
+packages = [{ include = "weather_cli", from = "src" }]
+
+[tool.poetry.scripts]
+# Console command → module:function (note: NO hyphens)
+weather = "weather_cli.cli:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
