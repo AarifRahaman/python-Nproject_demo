@@ -1,0 +1,15 @@
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  script:
+    - echo "Building project..."
+    - g++ main.cpp -o app.exe
+
+test:
+  stage: test
+  script:
+    - echo "Running tests..."
+    - ./app.exe
