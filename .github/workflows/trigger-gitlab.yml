@@ -8,23 +8,27 @@ jobs:
   trigger:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger GitLab and fail loudly (heredoc)
+      - name: Trigger GitLab and fail loudly
         shell: bash
+        env:
+          GL_URL: ${{ secrets.GITLAB_URL }}
+          GL_PID: ${{ secrets.GITLAB_PROJECT_ID }}
+          GL_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          PAYLOAD: |
+            {"ref":"main","variables":[
+              {"key":"LANGUAGE","value":"python"},
+              {"key":"REPO_URL","value":"https://github.com/AarifRahaman/python-Nproject_demo.git"},
+              {"key":"SUBDIR","value":"weather-poetry"}
+            ]}
         run: |
           set -euo pipefail
-          resp=$(curl -sS -w '\n%{http_code}' \
-            -H "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" \
+          URL="$GL_URL/api/v4/projects/$GL_PID/pipeline"
+          code=$(curl -sS -o /tmp/body.json -w '%{http_code}' \
+            -H "PRIVATE-TOKEN: $GL_TOKEN" \
             -H "Content-Type: application/json" \
-            -d @- "${{ secrets.GITLAB_URL }}/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/pipeline" <<'JSON'
-{"ref":"main","variables":[
-  {"key":"LANGUAGE","value":"python"},
-  {"key":"REPO_URL","value":"https://github.com/AarifRahaman/python-Nproject_demo.git"},
-  {"key":"SUBDIR","value":"weather-poetry"}
-]}
-JSON
-          )
-          body=$(printf '%s' "$resp" | sed '$d')
-          code=$(printf '%s' "$resp" | tail -n1)
+            -d "$PAYLOAD" \
+            "$URL")
           echo "GitLab API status: $code"
-          echo "GitLab API body: $body"
+          echo "GitLab API body:"
+          cat /tmp/body.json
           test "$code" = "201"
