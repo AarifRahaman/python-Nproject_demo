@@ -16,18 +16,15 @@ jobs:
             -H "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d @- "${{ secrets.GITLAB_URL }}/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/pipeline" <<'JSON'
-{
-  "ref": "main",
-  "variables": [
-    { "key": "LANGUAGE", "value": "python" },
-    { "key": "REPO_URL", "value": "https://github.com/AarifRahaman/python-Nproject_demo.git" },
-    { "key": "SUBDIR",   "value": "weather-poetry" }
-  ]
-}
+{"ref":"main","variables":[
+  {"key":"LANGUAGE","value":"python"},
+  {"key":"REPO_URL","value":"https://github.com/AarifRahaman/python-Nproject_demo.git"},
+  {"key":"SUBDIR","value":"weather-poetry"}
+]}
 JSON
           )
           body=$(printf '%s' "$resp" | sed '$d')
           code=$(printf '%s' "$resp" | tail -n1)
           echo "GitLab API status: $code"
           echo "GitLab API body: $body"
-          test "$code" = "201" || { echo "Failed to create pipeline"; exit 1; }
+          test "$code" = "201"
