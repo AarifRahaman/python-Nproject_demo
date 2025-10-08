@@ -1,26 +1,32 @@
-name: Trigger GitLab pipeline (Python)
+name: Trigger GitLab (Python CI-hub)
 
 on:
   push:
-    branches: [ "main" ]   # or change as you like
+    branches: [ "main" ]
 
 jobs:
   trigger:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger GitLab pipeline (Python)
+      - name: Trigger GitLab and fail loudly
+        shell: bash
         run: |
           set -euo pipefail
-          curl -sS -X POST \
+          URL="${{ secrets.GITLAB_URL }}/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/pipeline"
+          PAYLOAD='{"ref":"main","variables":[
+            {"key":"LANGUAGE","value":"python"},
+            {"key":"REPO_URL","value":"https://github.com/AarifRahaman/python-Nproject_demo.git"},
+            {"key":"SUBDIR","value":"weather-poetry"}]}'
+
+          echo "POST $URL"
+          # Send request, save body, capture status code
+          code=$(curl -sS -o /tmp/body.json -w '%{http_code}' \
             -H "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" \
             -H "Content-Type: application/json" \
-            -d @- "${{ secrets.GITLAB_URL }}/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/pipeline" <<'JSON'
-          {
-            "ref": "main",
-            "variables": [
-              {"key": "LANGUAGE", "value": "python"},
-              {"key": "REPO_URL", "value": "https://github.com/AarifRahaman/python-Nproject_demo.git"},
-              {"key": "SUBDIR", "value": "weather-poetry"}
-            ]
-          }
-          JSON
+            -d "$PAYLOAD" \
+            "$URL")
+
+          echo "GitLab API status: $code"
+          echo "GitLab API body:"
+          cat /tmp/body.json
+          test "$code" = "201"
