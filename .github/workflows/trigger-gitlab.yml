@@ -15,6 +15,6 @@ jobs:
             -H "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" \
             --data-urlencode "ref=main" \
             --data-urlencode "variables[LANGUAGE]=python" \
-            --data-urlencode "variables[REPO_URL]=https://github.com/${{ github.repository }}.git" \
+            --data-urlencode "variables[REPO_URL]=https://github.com/AarifRahaman/python-Nproject_demo.git" \
             --data-urlencode "variables[SUBDIR]=weather-poetry" \
             "${{ secrets.GITLAB_URL }}/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/pipeline"
