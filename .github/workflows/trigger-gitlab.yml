@@ -1,20 +1,16 @@
-name: Trigger GitLab (Python CI-hub)
-
-on:
-  push:
-    branches: [ "main" ]   # adjust as you like
-
-jobs:
-  trigger:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger GitLab pipeline for Python
-        run: |
-          set -euo pipefail
-          curl -sS -X POST \
-            -H "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" \
-            --data-urlencode "ref=main" \
-            --data-urlencode "variables[LANGUAGE]=python" \
-            --data-urlencode "variables[REPO_URL]=https://github.com/AarifRahaman/python-Nproject_demo.git" \
-            --data-urlencode "variables[SUBDIR]=weather-poetry" \
-            "${{ secrets.GITLAB_URL }}/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/pipeline"
+- name: Trigger GitLab pipeline (Python)
+  run: |
+    set -euo pipefail
+    curl -sS -X POST \
+      -H "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" \
+      -H "Content-Type: application/json" \
+      -d @- "${{ secrets.GITLAB_URL }}/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/pipeline" <<'JSON'
+    {
+      "ref": "main",
+      "variables": [
+        {"key": "LANGUAGE", "value": "python"},
+        {"key": "REPO_URL", "value": "https://github.com/AarifRahaman/python-Nproject_demo.git"},
+        {"key": "SUBDIR",  "value": "weather-poetry"}
+      ]
+    }
+JSON
