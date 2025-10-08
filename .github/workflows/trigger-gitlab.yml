@@ -30,4 +30,4 @@ JSON
           code=$(printf '%s' "$resp" | tail -n1)
           echo "GitLab API status: $code"
           echo "GitLab API body: $body"
-          test "$code" = "201" || { echo "❌ Failed to create pipeline"; exit 1; }
+          test "$code" = "201" || { echo "Failed to create pipeline"; exit 1; }
