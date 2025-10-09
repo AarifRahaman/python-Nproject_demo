@@ -9,7 +9,7 @@ jobs:
     uses: AarifRahaman/ci-infra/.github/workflows/trigger-gitlab.yml@main
     with:
       gitlab_url: https://gitlab.com
-      project_id: "PUT_YOUR_PY_GITLAB_PROJECT_ID_HERE"
+      project_id: "75144775"
       ref: main
       language: "python"
       repo_url: "https://github.com/${{ github.repository }}"
