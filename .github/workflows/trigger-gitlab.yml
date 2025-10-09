@@ -1,0 +1,26 @@
+name: Trigger GitLab (Python)
+
+on:
+  push:
+    branches: [ "main" ]   # change if your default branch is different
+  workflow_dispatch:
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    env:
+      GITLAB_URL: ${{ secrets.GITLAB_URL }}
+      GITLAB_PROJECT_ID: ${{ secrets.GITLAB_PROJECT_ID }}   # <- Python project’s numeric ID in GitLab
+      GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}             # <- token that can access the Python GitLab project
+    steps:
+      - name: Trigger GitLab pipeline
+        run: |
+          set -euo pipefail
+          echo "➡️  Triggering ${GITLAB_URL}/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline for ref ${GITHUB_REF_NAME}"
+          curl --fail-with-body -sS -X POST \
+            -H "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
+            --data "ref=${GITHUB_REF_NAME}" \
+            --data-urlencode "variables[LANGUAGE]=python" \
+            "${GITLAB_URL}/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
+          echo ""
+          echo "✅ Trigger sent."
