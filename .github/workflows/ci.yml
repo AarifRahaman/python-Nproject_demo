@@ -6,12 +6,22 @@ on:
 
 jobs:
   trigger-gitlab:
-    uses: AarifRahaman/ci-infra/.github/workflows/trigger-gitlab.yml@main
-    with:
-      gitlab_url: https://gitlab.com
-      project_id: "75144775"
-      ref: main
-      language: "python"
-      repo_url: "https://github.com/${{ github.repository }}"
-    secrets:
-      GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+    runs-on: ubuntu-latest
+    env:
+      # Hardcode the URL to avoid bad secrets/whitespace issues
+      GITLAB_URL: "https://gitlab.com"
+      PROJECT_ID: "75144775"   # <- put the real number here
+      TOKEN: ${{ secrets.GITLAB_TOKEN }}
+      REF: ${{ github.ref_name }}
+      LANGUAGE: "python"   # or "python" in the Python repo
+      REPO_URL: "https://github.com/${{ github.repository }}"
+    steps:
+      - name: Trigger GitLab pipeline
+        shell: bash
+        run: >
+          curl --fail -sS -X POST
+          -H "PRIVATE-TOKEN: ${TOKEN}"
+          --data-urlencode ref=${REF}
+          --data-urlencode variables[LANGUAGE]=${LANGUAGE}
+          --data-urlencode variables[REPO_URL]=${REPO_URL}
+          "${GITLAB_URL}/api/v4/projects/${PROJECT_ID}/pipeline"
