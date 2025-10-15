@@ -1,26 +1,24 @@
-name: Trigger GitLab (Python)
+name: Trigger GitLab (C++)
 
 on:
   push:
-    branches: [ "main" ]   # change if your default branch is different
-  workflow_dispatch:
+    branches: [ "main" ]
 
 jobs:
   trigger:
     runs-on: ubuntu-latest
-    env:
-      GITLAB_URL: ${{ secrets.GITLAB_URL }}
-      GITLAB_PROJECT_ID: ${{ secrets.GITLAB_PROJECT_ID }}   # <- Python project’s numeric ID in GitLab
-      GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}             # <- token that can access the Python GitLab project
     steps:
       - name: Trigger GitLab pipeline
+        env:
+          API_URL: ${{ secrets.GITLAB_URL }}/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/pipeline
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
           set -euo pipefail
-          echo "➡️  Triggering ${GITLAB_URL}/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline for ref ${GITHUB_REF_NAME}"
+          echo "➡️  Triggering $API_URL for ref $GITHUB_REF_NAME"
           curl --fail-with-body -sS -X POST \
             -H "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
-            --data "ref=main" \
-            --data-urlencode "variables[LANGUAGE]=python" \
-            "${GITLAB_URL}/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
-          echo ""
-          echo "✅ Trigger sent."
+            -d "ref=${GITHUB_REF_NAME}" \
+            -d "variables[][key]=LANGUAGE" \
+            -d "variables[][value]=py" \
+            "$API_URL"
+          echo "✅ Trigger sent for Python project."
