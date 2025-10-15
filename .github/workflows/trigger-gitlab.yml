@@ -19,6 +19,6 @@ jobs:
             -H "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
             -d "ref=${GITHUB_REF_NAME}" \
             -d "variables[][key]=LANGUAGE" \
-            -d "variables[][value]=py" \
+            -d "variables[][value]=python" \
             "$API_URL"
           echo "✅ Trigger sent for Python project."
